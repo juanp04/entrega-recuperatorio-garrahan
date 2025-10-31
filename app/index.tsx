@@ -1,5 +1,5 @@
 import { Picker } from '@react-native-picker/picker';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 type Character = {
@@ -23,7 +23,7 @@ export default function Index() {
   const [hasNextPage, setHasNextPage] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const fetchCharacters = async (reset = false) => {
+  const fetchCharacters = useCallback(async (reset = false) => {
     if (loading || !hasNextPage) return;
     setLoading(true);
     try {
@@ -42,18 +42,18 @@ export default function Index() {
         setHasNextPage(data.info.next !== null);
         setPage(currentPage + 1);
       }
-    } catch (e) {
+    } catch {
       setHasNextPage(false);
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, name, status, gender, hasNextPage, loading, characters]);
 
   useEffect(() => {
     setPage(1);
     setHasNextPage(true);
     fetchCharacters(true);
-  }, [name, status, gender]);
+  }, [name, status, gender, fetchCharacters]);
 
   const openModal = (char: Character) => {
     setSelectedCharacter(char);
